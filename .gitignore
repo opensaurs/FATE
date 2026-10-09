@@ -57,3 +57,25 @@ flatpak/rendered/
 # Icon artwork masters. build/ is ignored (generated), but these are the sources
 # scripts/generate-icons.mjs derives everything from, so they must be tracked.
 !brand/
+
+# AUR build artifacts
+aur/src/
+aur/pkg/
+aur/deb/
+aur/root/
+aur/*.deb
+aur/*.pkg.tar.*
+aur/LICENSE-*
+
+# Package build outputs & archives
+*.AppImage
+*.deb
+*.rpm
+*.pkg.tar.*
+*.zip
+
+# Temporary & scratch files
+.scratch/
+scratch/
+*.tmp
+

@@ -49,4 +49,8 @@ function contentSecurityPolicy() {
 export default defineConfig({
   plugins: [react(), contentSecurityPolicy()],
   base: './',
+  build: {
+    target: 'chrome105',
+    cssTarget: 'chrome105'
+  }
 })
