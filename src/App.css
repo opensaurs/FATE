@@ -1313,15 +1313,14 @@ kbd {
   font-size: var(--doc-font-size, 1.03rem);
 }
 
-/* Document headings use Cinzel. This is the one place the ceremonial register earns its keep in a
-   utility-tier app: it makes rendered documents feel typeset rather than dumped. */
+/* Document headings use the configured document heading font or fall back to document body font. */
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3,
 .markdown-body h4,
 .markdown-body h5,
 .markdown-body h6 {
-  font-family: var(--font-display);
+  font-family: var(--font-heading, var(--font-doc, var(--font-sans)));
   margin-top: 2rem;
   margin-bottom: 1rem;
   font-weight: 700;

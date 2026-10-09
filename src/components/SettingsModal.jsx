@@ -99,12 +99,21 @@ function FontPicker({ value, options, onChange, mono, systemFonts = [], labelled
   const systemMatches = q ? systemFonts.filter((n) => n.toLowerCase().includes(q)) : systemFonts;
   const systemShown = systemMatches.slice(0, SYSTEM_FONT_LIMIT);
 
+  const trimmedQuery = query.trim();
+  const hasExactMatch = q
+    ? options.some((o) => o.label.toLowerCase() === q) || systemFonts.some((n) => n.toLowerCase() === q)
+    : true;
+  const customOption =
+    trimmedQuery && !hasExactMatch
+      ? systemFontEntry(`system:${trimmedQuery}`, mono)
+      : null;
+
   const pick = (id) => {
     onChange(id);
     setOpen(false);
   };
 
-  const renderOption = (o) => (
+  const renderOption = (o, customLabel) => (
     <li
       key={o.id}
       role="option"
@@ -114,7 +123,7 @@ function FontPicker({ value, options, onChange, mono, systemFonts = [], labelled
     >
       <span className="fp-texts">
         <span className="fp-name" style={{ fontFamily: o.stack }}>
-          {o.label}
+          {customLabel || o.label}
           {o.ligatures && <span className="fp-tag">ligatures</span>}
         </span>
         <span className="fp-sample" style={{ fontFamily: o.stack }}>
@@ -142,29 +151,40 @@ function FontPicker({ value, options, onChange, mono, systemFonts = [], labelled
 
       {open && (
         <div className={`font-picker-list ${openUp ? 'up' : ''}`}>
-          {systemFonts.length > 0 && (
-            <input
-              ref={filterRef}
-              className="fp-filter"
-              placeholder={`Search ${systemFonts.length + options.length} fonts…`}
-              aria-label="Search fonts"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => {
-                // Enter takes the first visible match, the fastest path from typing to chosen.
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  const first = bundled[0] ?? (systemShown[0] && systemFontEntry(`system:${systemShown[0]}`, mono));
-                  if (first) pick(first.id);
-                }
-              }}
-              spellCheck={false}
-            />
-          )}
+          <input
+            ref={filterRef}
+            className="fp-filter"
+            placeholder={
+              systemFonts.length > 0
+                ? `Search ${systemFonts.length + options.length} fonts or type name…`
+                : 'Search or type font name…'
+            }
+            aria-label="Search fonts"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                const first =
+                  customOption ??
+                  bundled[0] ??
+                  (systemShown[0] && systemFontEntry(`system:${systemShown[0]}`, mono));
+                if (first) pick(first.id);
+              }
+            }}
+            spellCheck={false}
+          />
 
           <ul role="listbox" aria-labelledby={labelledBy}>
+            {customOption && (
+              <>
+                <li className="fp-section">Custom system font</li>
+                {renderOption(customOption, `Use system font "${trimmedQuery}"`)}
+              </>
+            )}
+
             {bundled.length > 0 && <li className="fp-section">Bundled with FATE</li>}
-            {bundled.map(renderOption)}
+            {bundled.map((o) => renderOption(o))}
 
             {systemFonts.length > 0 && systemShown.length > 0 && (
               <li className="fp-section">Installed on this PC</li>
@@ -175,7 +195,7 @@ function FontPicker({ value, options, onChange, mono, systemFonts = [], labelled
                 {systemMatches.length - SYSTEM_FONT_LIMIT} more. Keep typing to narrow the list.
               </li>
             )}
-            {bundled.length === 0 && systemShown.length === 0 && (
+            {!customOption && bundled.length === 0 && systemShown.length === 0 && (
               <li className="fp-more">No fonts match &quot;{query}&quot;</li>
             )}
           </ul>
@@ -642,13 +662,21 @@ function SettingsModal({
                     <span className="setting-label" id={idFor('font-ui')}>Application font</span>
                     <FontPicker labelledBy={idFor('font-ui')} systemFonts={systemFonts} value={fonts.ui} options={PROSE_FONTS} onChange={(id) => setFonts({ ui: id })} />
                   </div>
+                  <div className="setting-item">
+                    <span className="setting-label" id={idFor('font-display')}>UI Title / Display font</span>
+                    <FontPicker labelledBy={idFor('font-display')} systemFonts={systemFonts} value={fonts.display} options={PROSE_FONTS} onChange={(id) => setFonts({ display: id })} />
+                  </div>
                 </div>
 
                 <div className="setting-group">
                   <span className="group-caption">Markdown documents</span>
                   <div className="setting-item">
-                    <span className="setting-label" id={idFor('font-md')}>Document font</span>
+                    <span className="setting-label" id={idFor('font-md')}>Document body font</span>
                     <FontPicker labelledBy={idFor('font-md')} systemFonts={systemFonts} value={fonts.markdown} options={PROSE_FONTS} onChange={(id) => setFonts({ markdown: id })} />
+                  </div>
+                  <div className="setting-item">
+                    <span className="setting-label" id={idFor('font-heading')}>Document heading font</span>
+                    <FontPicker labelledBy={idFor('font-heading')} systemFonts={systemFonts} value={fonts.heading} options={PROSE_FONTS} onChange={(id) => setFonts({ heading: id })} />
                   </div>
                   <SizeSlider label="Document text size" value={fonts.markdownSize} min={12} max={22} onChange={(v) => setFonts({ markdownSize: v })} />
                 </div>

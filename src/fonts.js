@@ -64,28 +64,30 @@ const SYSTEM_MONO = "ui-monospace, 'Cascadia Code', SFMono-Regular, Consolas, mo
 
 /** Interface / document faces. `sample` is the preview line the picker renders in the face. */
 export const PROSE_FONTS = [
+  { id: 'system-sans', label: 'System default', kind: 'sans', stack: SYSTEM_SANS },
   { id: 'inter', label: 'Inter', kind: 'sans', stack: `'Inter', ${SYSTEM_SANS}` },
   { id: 'ibm-plex-sans', label: 'IBM Plex Sans', kind: 'sans', stack: `'IBM Plex Sans', ${SYSTEM_SANS}` },
   { id: 'source-serif', label: 'Source Serif 4', kind: 'serif', stack: `'Source Serif 4', Georgia, serif` },
   { id: 'lora', label: 'Lora', kind: 'serif', stack: `'Lora', Georgia, serif` },
-  { id: 'merriweather', label: 'Merriweather', kind: 'serif', stack: `'Merriweather', Georgia, serif` },
-  { id: 'system-sans', label: 'System default', kind: 'sans', stack: SYSTEM_SANS }
+  { id: 'merriweather', label: 'Merriweather', kind: 'serif', stack: `'Merriweather', Georgia, serif` }
 ];
 
 export const CODE_FONTS = [
+  { id: 'system-mono', label: 'System monospace', stack: SYSTEM_MONO },
   { id: 'jetbrains-mono', label: 'JetBrains Mono', stack: `'JetBrains Mono', ${SYSTEM_MONO}` },
   { id: 'fira-code', label: 'Fira Code', stack: `'Fira Code', ${SYSTEM_MONO}`, ligatures: true },
   { id: 'cascadia-code', label: 'Cascadia Code', stack: `'Cascadia Code', ${SYSTEM_MONO}`, ligatures: true },
   { id: 'source-code-pro', label: 'Source Code Pro', stack: `'Source Code Pro', ${SYSTEM_MONO}` },
   { id: 'ibm-plex-mono', label: 'IBM Plex Mono', stack: `'IBM Plex Mono', ${SYSTEM_MONO}` },
-  { id: 'roboto-mono', label: 'Roboto Mono', stack: `'Roboto Mono', ${SYSTEM_MONO}` },
-  { id: 'system-mono', label: 'System monospace', stack: SYSTEM_MONO }
+  { id: 'roboto-mono', label: 'Roboto Mono', stack: `'Roboto Mono', ${SYSTEM_MONO}` }
 ];
 
 export const DEFAULT_FONTS = {
-  ui: 'inter',
-  markdown: 'inter',
-  code: 'jetbrains-mono',
+  ui: 'system-sans',
+  display: 'system-sans',
+  markdown: 'system-sans',
+  heading: 'system-sans',
+  code: 'system-mono',
   markdownSize: 16,
   editorSize: 14,
   ligatures: true,
@@ -151,7 +153,9 @@ export function resolveFonts(stored) {
 
   return {
     ui: proseId(s.ui, DEFAULT_FONTS.ui),
+    display: proseId(s.display, DEFAULT_FONTS.display),
     markdown: proseId(s.markdown, DEFAULT_FONTS.markdown),
+    heading: proseId(s.heading, DEFAULT_FONTS.heading),
     code: codeId(s.code, DEFAULT_FONTS.code),
     markdownSize: clamp(s.markdownSize, 12, 22, DEFAULT_FONTS.markdownSize),
     editorSize: clamp(s.editorSize, 10, 20, DEFAULT_FONTS.editorSize),
@@ -164,7 +168,9 @@ export function resolveFonts(stored) {
 export function applyFonts(fonts) {
   const root = document.documentElement.style;
   root.setProperty('--font-sans', fontStack(fonts.ui, DEFAULT_FONTS.ui));
+  root.setProperty('--font-display', fontStack(fonts.display || fonts.ui, DEFAULT_FONTS.display));
   root.setProperty('--font-doc', fontStack(fonts.markdown, DEFAULT_FONTS.markdown));
+  root.setProperty('--font-heading', fontStack(fonts.heading || fonts.markdown, DEFAULT_FONTS.heading));
   root.setProperty('--font-mono', fontStack(fonts.code, DEFAULT_FONTS.code, true));
   root.setProperty('--doc-font-size', `${fonts.markdownSize}px`);
   root.setProperty('--editor-font-size', `${fonts.editorSize}px`);

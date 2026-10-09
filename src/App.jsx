@@ -1933,8 +1933,16 @@ function App() {
          */
         .finally(() => api.appReady());
 
-      api.getRuntimeInfo?.().then(setRuntimeInfo).catch(() => {});
-      api.getSystemFonts?.().then(setSystemFonts).catch(() => {});
+      const mergeFonts = (newFonts) => {
+        if (!Array.isArray(newFonts) || newFonts.length === 0) return;
+        setSystemFonts((prev) => Array.from(new Set([...prev, ...newFonts])).sort((a, b) => a.localeCompare(b)));
+      };
+      api.getSystemFonts?.().then(mergeFonts).catch(() => {});
+      if (typeof window !== 'undefined' && typeof window.queryLocalFonts === 'function') {
+        window.queryLocalFonts().then((fonts) => {
+          mergeFonts(fonts.map((f) => f.family));
+        }).catch(() => {});
+      }
 
       api.onOpenFile((content, name, path, meta) => {
         opsRef.current.openDocument(content, name, path, meta);

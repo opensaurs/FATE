@@ -860,14 +860,14 @@ const PDF_MARGINS = { top: 0.6, bottom: 0.6, left: 0.65, right: 0.65 };
  */
 function headerTemplate(docName) {
   const safe = String(docName || '').replace(/[<>&]/g, '');
-  return `<div style="font-family:Georgia,serif;font-size:8px;color:#666;width:100%;padding:0 0.65in;
+  return `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:8px;color:#666;width:100%;padding:0 0.65in;
     display:flex;justify-content:space-between;align-items:center;">
     <span style="letter-spacing:0.08em;text-transform:uppercase;">${safe}</span>
     <span class="date" style="letter-spacing:0.04em;"></span>
   </div>`;
 }
 
-const FOOTER_TEMPLATE = `<div style="font-family:Georgia,serif;font-size:8px;color:#888;width:100%;
+const FOOTER_TEMPLATE = `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:8px;color:#888;width:100%;
   padding:0 0.65in;display:flex;justify-content:space-between;align-items:center;">
   <span style="letter-spacing:0.1em;text-transform:uppercase;">FATE</span>
   <span><span class="pageNumber"></span> / <span class="totalPages"></span></span>
